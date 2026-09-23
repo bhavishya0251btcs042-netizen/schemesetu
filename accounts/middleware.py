@@ -47,7 +47,7 @@ class JWTAuthMiddleware(MiddlewareMixin):
                     request._jwt_refresh_needed = True
                     request._jwt_refresh_user = user
                     return
-                except User.DoesNotExist:
+                except (User.DoesNotExist, Exception):
                     pass
 
         # No valid tokens - ensure AnonymousUser if not already set

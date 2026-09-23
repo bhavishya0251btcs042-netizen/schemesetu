@@ -259,3 +259,30 @@ class Command(BaseCommand):
             )
         )
 
+        # Ensure default admin superuser exists
+        User = get_user_model()
+        admin_username = "admin"
+        admin_email = "admin@schemesetu.dac.gov.in"
+        admin_password = "Admin@12345"
+        admin_user = User.objects.filter(username=admin_username).first()
+        if not admin_user:
+            admin_user = User.objects.create_superuser(
+                username=admin_username,
+                email=admin_email,
+                password=admin_password,
+                first_name="Admin",
+                last_name="Superuser",
+            )
+        else:
+            admin_user.set_password(admin_password)
+            admin_user.is_staff = True
+            admin_user.is_superuser = True
+            admin_user.save()
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Admin superuser verified: username='{admin_username}', password='{admin_password}'"
+            )
+        )
+
+

@@ -106,5 +106,5 @@ def get_user_from_access_token(request):
     User = get_user_model()
     try:
         return User.objects.get(pk=payload["user_id"], is_active=True)
-    except User.DoesNotExist:
+    except (User.DoesNotExist, Exception):
         return None

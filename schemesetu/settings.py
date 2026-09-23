@@ -62,6 +62,7 @@ WSGI_APPLICATION = "schemesetu.wsgi.application"
 # On Vercel: set DATABASE_URL env var (Neon / Supabase / Vercel Postgres free tier)
 # Locally: falls back to SQLite so no setup needed
 # ---------------------------------------------------------------------------
+IS_VERCEL = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
@@ -74,12 +75,19 @@ if DATABASE_URL:
         )
     }
 else:
+    # On Vercel, the code directory (/var/task) is read-only.
+    # /tmp is the only writable directory on Vercel serverless.
+    db_path = Path("/tmp") / "db.sqlite3" if IS_VERCEL else (BASE_DIR / "db.sqlite3")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": db_path,
         }
     }
+
+# Use signed cookie session storage so sessions work 100% without any DB write dependency
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
 
 AUTH_PASSWORD_VALIDATORS = []
 

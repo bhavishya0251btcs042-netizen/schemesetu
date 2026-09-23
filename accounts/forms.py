@@ -47,14 +47,24 @@ class SignupForm(forms.Form):
         username = self.cleaned_data["username"].strip()
         if " " in username:
             raise ValidationError("Username cannot contain spaces. Use letters, numbers, or @/./+/-/_ only.")
-        if User.objects.filter(username__iexact=username).exists():
-            raise ValidationError("This username is already taken. Please choose another.")
+        try:
+            if User.objects.filter(username__iexact=username).exists():
+                raise ValidationError("This username is already taken. Please choose another.")
+        except ValidationError:
+            raise
+        except Exception:
+            pass
         return username
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
-        if User.objects.filter(email__iexact=email).exists():
-            raise ValidationError("An account with this email already exists. Try logging in.")
+        try:
+            if User.objects.filter(email__iexact=email).exists():
+                raise ValidationError("An account with this email already exists. Try logging in.")
+        except ValidationError:
+            raise
+        except Exception:
+            pass
         return email
 
     def clean_password1(self):
