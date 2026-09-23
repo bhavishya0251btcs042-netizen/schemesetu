@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Create Account · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="auth-icon">🎓</div>
+      <h1 class="auth-title">Create your account</h1>
+      <p class="auth-subtitle">Join SchemeSetu and never miss a scholarship you deserve.</p>
+    </div>
+
+    <!-- Form -->
+    <form method="post" action="{% url 'accounts:signup' %}" class="form auth-form" id="signupForm" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-error" role="alert">
+          {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="form-grid">
+
+        <div class="field col-span-full">
+          <label for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="req">*</span></label>
+          {{ form.name }}
+          {% if form.name.errors %}<span class="err">{{ form.name.errors|striptags }}</span>{% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">{{ form.username.label }} <span class="req">*</span></label>
+          {{ form.username }}
+          {% if form.username.errors %}<span class="err">{{ form.username.errors|striptags }}</span>{% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<span class="err">{{ form.phone.errors|striptags }}</span>{% endif %}
+        </div>
+
+        <div class="field col-span-full">
+          <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="req">*</span></label>
+          {{ form.email }}
+          <p class="hint">We will send an OTP to verify this email (shown on next screen for demo).</p>
+          {% if form.email.errors %}<span class="err">{{ form.email.errors|striptags }}</span>{% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span class="req">*</span></label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<span class="err">{{ form.password1.errors|striptags }}</span>{% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span class="req">*</span></label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<span class="err">{{ form.password2.errors|striptags }}</span>{% endif %}
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Password strength indicator -->
+      <div class="password-strength" id="pwStrength" style="margin-top:-.5rem;margin-bottom:.75rem;display:none;">
+        <div class="pw-bar"><div class="pw-fill" id="pwFill"></div></div>
+        <span class="pw-label" id="pwLabel"></span>
+      </div>
+
+      <div class="auth-actions">
+        <button type="submit" class="btn btn-lg btn-success" style="width:100%;">
+          Send OTP &amp; Continue &rarr;
+        </button>
+      </div>
+
+      <p class="auth-switch">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Live password strength meter
+  const p1 = document.getElementById('id_password1');
+  const bar = document.getElementById('pwFill');
+  const label = document.getElementById('pwLabel');
+  const wrap = document.getElementById('pwStrength');
+  if (p1) {
+    p1.addEventListener('input', function() {
+      const v = p1.value;
+      wrap.style.display = v.length ? 'flex' : 'none';
+      let score = 0;
+      if (v.length >= 8) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      const levels = ['Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['#e53e3e', '#e07b00', '#2b8a3e', '#1a5c96'];
+      bar.style.width = (score * 25) + '%';
+      bar.style.background = colors[score - 1] || '#e53e3e';
+      label.textContent = levels[score - 1] || 'Weak';
+      label.style.color = colors[score - 1] || '#e53e3e';
+    });
+  }
+</script>
+{% endblock %}

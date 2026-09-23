@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ PRODUCT_NAME }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="{% url 'core:home' %}" aria-label="{{ PRODUCT_NAME }} Home">
+        <span class="brand-mark">{{ PRODUCT_NAME }}</span>
+        <span class="brand-tag">{{ PRODUCT_TAGLINE }}</span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Toggle navigation" aria-controls="primaryNav">
+        <span class="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+
+      <nav class="nav" id="primaryNav">
+        <a href="{% url 'core:check' %}">Check eligibility</a>
+        <a href="{% url 'core:track' %}">Track application</a>
+        <a href="{% url 'core:notifications' %}">🔔 Alerts</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}" class="nav-user">👤 {{ user.first_name|default:user.username }}</a>
+          <a href="{% url 'accounts:logout' %}" class="nav-logout">Logout</a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="nav-login">Login</a>
+          <a href="{% url 'accounts:signup' %}" class="btn btn-nav-cta">Sign Up Free</a>
+        {% endif %}
+        <a class="admin-link" href="/admin/">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    {% if messages %}
+      <div class="messages" role="alert">
+        {% for m in messages %}<div class="msg msg-{{ m.tags }}">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span class="dac">{{ DAC_FOOTER }}</span>
+      <span class="dac-tagline">AI Citizen Services &amp; Scholarship Navigator</span>
+    </div>
+  </footer>
+
+  <script>
+    // Responsive offline navigation toggle
+    (function() {
+      const toggle = document.getElementById('navToggle');
+      const nav = document.getElementById('primaryNav');
+      if (!toggle || !nav) return;
+
+      toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = nav.classList.contains('is-open');
+        if (isOpen) {
+          nav.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          nav.classList.add('is-open');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      // Close on outside click
+      document.addEventListener('click', function(e) {
+        if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+          nav.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Close on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+          nav.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.focus();
+        }
+      });
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

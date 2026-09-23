@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+{% block title %}Complete Student Profile · Check Eligibility · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Check Your Scholarship Eligibility</h1>
+<p class="lede">Provide your full student profile to check eligibility against all government scholarships and approved-institution lists.</p>
+
+<form method="post" class="form" id="profileForm" novalidate>
+  {% csrf_token %}
+
+  <!-- 1. PERSONAL DETAILS -->
+  <div class="form-section">
+    <h2 class="form-section-title">1. Personal Information</h2>
+    <p class="form-section-desc">Basic demographic, contact, and domicile details for scheme qualification.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.name.id_for_label }}">{{ form.name.label }} *</label>
+        {{ form.name }}
+        {% if form.name.errors %}<span class="err">{{ form.name.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }} <span class="hint">(auto-calculates age)</span></label>
+        {{ form.date_of_birth }}
+        {% if form.date_of_birth.errors %}<span class="err">{{ form.date_of_birth.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.age.id_for_label }}">{{ form.age.label }} *</label>
+        {{ form.age }}
+        {% if form.age.errors %}<span class="err">{{ form.age.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }} *</label>
+        {{ form.gender }}
+        {% if form.gender.errors %}<span class="err">{{ form.gender.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.category.id_for_label }}">{{ form.category.label }} *</label>
+        {{ form.category }}
+        {% if form.category.errors %}<span class="err">{{ form.category.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.annual_income.id_for_label }}">{{ form.annual_income.label }} *</label>
+        {{ form.annual_income }}
+        {% if form.annual_income.errors %}<span class="err">{{ form.annual_income.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.state.id_for_label }}">{{ form.state.label }}</label>
+        {{ form.state }}
+        {% if form.state.errors %}<span class="err">{{ form.state.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.district.id_for_label }}">{{ form.district.label }}</label>
+        {{ form.district }}
+        {% if form.district.errors %}<span class="err">{{ form.district.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}<span class="err">{{ form.phone.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {{ form.email }}
+        {% if form.email.errors %}<span class="err">{{ form.email.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.disability_status.id_for_label }}">{{ form.disability_status.label }}</label>
+        {{ form.disability_status }}
+        {% if form.disability_status.errors %}<span class="err">{{ form.disability_status.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+        {{ form.address }}
+        {% if form.address.errors %}<span class="err">{{ form.address.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field checkbox-field col-span-full">
+        {{ form.aadhaar_linked }}
+        <label for="{{ form.aadhaar_linked.id_for_label }}">{{ form.aadhaar_linked.label }}</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ACADEMIC DETAILS -->
+  <div class="form-section">
+    <h2 class="form-section-title">2. Academic Information</h2>
+    <p class="form-section-desc">Current education level, current institution, and previous academic track record.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.education_level.id_for_label }}">{{ form.education_level.label }} *</label>
+        {{ form.education_level }}
+        {% if form.education_level.errors %}<span class="err">{{ form.education_level.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_course.id_for_label }}">{{ form.current_course.label }}</label>
+        {{ form.current_course }}
+        {% if form.current_course.errors %}<span class="err">{{ form.current_course.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_institution.id_for_label }}">{{ form.current_institution.label }} <span class="hint">(checked against approved list)</span></label>
+        {{ form.current_institution }}
+        {% if form.current_institution.errors %}<span class="err">{{ form.current_institution.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_year.id_for_label }}">{{ form.current_year.label }}</label>
+        {{ form.current_year }}
+        {% if form.current_year.errors %}<span class="err">{{ form.current_year.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.latest_percentage.id_for_label }}">{{ form.latest_percentage.label }}</label>
+        {{ form.latest_percentage }}
+        {% if form.latest_percentage.errors %}<span class="err">{{ form.latest_percentage.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field checkbox-field col-span-full">
+        {{ form.is_student }}
+        <label for="{{ form.is_student.id_for_label }}">{{ form.is_student.label }}</label>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem; margin:1.5rem 0 0.75rem; color:var(--navy);">Past Qualifications (10th &amp; 12th)</h3>
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.board_10th.id_for_label }}">{{ form.board_10th.label }}</label>
+        {{ form.board_10th }}
+        {% if form.board_10th.errors %}<span class="err">{{ form.board_10th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.percentage_10th.id_for_label }}">{{ form.percentage_10th.label }}</label>
+        {{ form.percentage_10th }}
+        {% if form.percentage_10th.errors %}<span class="err">{{ form.percentage_10th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.board_12th.id_for_label }}">{{ form.board_12th.label }}</label>
+        {{ form.board_12th }}
+        {% if form.board_12th.errors %}<span class="err">{{ form.board_12th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.percentage_12th.id_for_label }}">{{ form.percentage_12th.label }}</label>
+        {{ form.percentage_12th }}
+        {% if form.percentage_12th.errors %}<span class="err">{{ form.percentage_12th.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SCHOOLS & COLLEGES ATTENDED (REPEATABLE) -->
+  <div class="form-section">
+    <h2 class="form-section-title">3. Schools &amp; Colleges Attended</h2>
+    <p class="form-section-desc">List all institutions you have attended. SchemeSetu automatically checks them against scholarship approved lists.</p>
+
+    <div id="institutionsContainer" class="repeatable-group">
+      {% if institutions %}
+        {% for inst in institutions %}
+          <div class="repeatable-item">
+            <div class="repeatable-item-head">
+              <span class="repeatable-item-badge">Institution #{{ forloop.counter }}</span>
+              <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label>Institution name *</label>
+                <input type="text" name="inst_name" value="{{ inst.name }}" placeholder="e.g. Delhi Public School / DBS Global University" required>
+              </div>
+              <div class="field">
+                <label>Institution type</label>
+                <select name="inst_type">
+                  {% for code, label in institution_types %}
+                    <option value="{{ code }}" {% if inst.institution_type == code %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label>Board / Affiliation</label>
+                <input type="text" name="inst_board" value="{{ inst.board_affiliation }}" placeholder="e.g. CBSE / State Board / AICTE">
+              </div>
+              <div class="field">
+                <label>City</label>
+                <input type="text" name="inst_city" value="{{ inst.city }}" placeholder="e.g. Dehradun">
+              </div>
+              <div class="field">
+                <label>State</label>
+                <input type="text" name="inst_state" value="{{ inst.state }}" placeholder="e.g. Uttarakhand">
+              </div>
+              <div class="field">
+                <label>Years attended</label>
+                <input type="text" name="inst_years" value="{{ inst.years_attended }}" placeholder="e.g. 2021-2023">
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Default initial blank row -->
+        <div class="repeatable-item">
+          <div class="repeatable-item-head">
+            <span class="repeatable-item-badge">Institution #1</span>
+            <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Institution name</label>
+              <input type="text" name="inst_name" placeholder="e.g. Delhi Public School / DBS Global University">
+            </div>
+            <div class="field">
+              <label>Institution type</label>
+              <select name="inst_type">
+                {% for code, label in institution_types %}
+                  <option value="{{ code }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label>Board / Affiliation</label>
+              <input type="text" name="inst_board" placeholder="e.g. CBSE / State Board / AICTE">
+            </div>
+            <div class="field">
+              <label>City</label>
+              <input type="text" name="inst_city" placeholder="e.g. Dehradun">
+            </div>
+            <div class="field">
+              <label>State</label>
+              <input type="text" name="inst_state" placeholder="e.g. Uttarakhand">
+            </div>
+            <div class="field">
+              <label>Years attended</label>
+              <input type="text" name="inst_years" placeholder="e.g. 2021-2023">
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="repeatable-actions">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnAddInstitution">+ Add Another School / College</button>
+    </div>
+  </div>
+
+  <!-- 4. ACADEMIC ACHIEVEMENTS (REPEATABLE) -->
+  <div class="form-section">
+    <h2 class="form-section-title">4. Academic Achievements</h2>
+    <p class="form-section-desc">Olympiads, ranks, hackathons, papers, or sports distinctions (strengthens merit-based selection).</p>
+
+    <div id="achievementsContainer" class="repeatable-group">
+      {% if achievements %}
+        {% for ach in achievements %}
+          <div class="repeatable-item">
+            <div class="repeatable-item-head">
+              <span class="repeatable-item-badge">Achievement #{{ forloop.counter }}</span>
+              <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label>Title *</label>
+                <input type="text" name="ach_title" value="{{ ach.title }}" placeholder="e.g. State Science Olympiad Gold Medal" required>
+              </div>
+              <div class="field">
+                <label>Level</label>
+                <select name="ach_level">
+                  {% for code, label in achievement_levels %}
+                    <option value="{{ code }}" {% if ach.level == code %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="field">
+                <label>Year</label>
+                <input type="text" name="ach_year" value="{{ ach.year }}" placeholder="e.g. 2024">
+              </div>
+              <div class="field col-span-full">
+                <label>Description / Organizing Body</label>
+                <input type="text" name="ach_desc" value="{{ ach.description }}" placeholder="Details, rank, or award description">
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <!-- Default initial blank row -->
+        <div class="repeatable-item">
+          <div class="repeatable-item-head">
+            <span class="repeatable-item-badge">Achievement #1</span>
+            <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Title</label>
+              <input type="text" name="ach_title" placeholder="e.g. State Science Olympiad Gold Medal">
+            </div>
+            <div class="field">
+              <label>Level</label>
+              <select name="ach_level">
+                {% for code, label in achievement_levels %}
+                  <option value="{{ code }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label>Year</label>
+              <input type="text" name="ach_year" placeholder="e.g. 2024">
+            </div>
+            <div class="field col-span-full">
+              <label>Description / Organizing Body</label>
+              <input type="text" name="ach_desc" placeholder="Details, rank, or award description">
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="repeatable-actions">
+      <button type="button" class="btn btn-ghost btn-sm" id="btnAddAchievement">+ Add Another Achievement</button>
+    </div>
+  </div>
+
+  <!-- 5. PROFESSIONAL & OTHER DETAILS -->
+  <div class="form-section">
+    <h2 class="form-section-title">5. Professional &amp; Prior Scholarships</h2>
+    <p class="form-section-desc">Employment status and records of any previous government financial assistance.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.employment_status.id_for_label }}">{{ form.employment_status.label }}</label>
+        {{ form.employment_status }}
+        {% if form.employment_status.errors %}<span class="err">{{ form.employment_status.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.achievements_notes.id_for_label }}">{{ form.achievements_notes.label }}</label>
+        {{ form.achievements_notes }}
+        {% if form.achievements_notes.errors %}<span class="err">{{ form.achievements_notes.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.scholarships_availed.id_for_label }}">{{ form.scholarships_availed.label }}</label>
+        {{ form.scholarships_availed }}
+        {% if form.scholarships_availed.errors %}<span class="err">{{ form.scholarships_availed.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SCHOLARSHIP ALERTS OPT-IN -->
+  <div class="form-section">
+    <h2 class="form-section-title">6. Scholarship Alert Notifications</h2>
+    <p class="form-section-desc">Opt in to receive automatic alerts when new matching scholarships become available on any platform.</p>
+    <div class="form-grid">
+      <div class="field col-span-full checkbox-field">
+        {{ form.subscribe_alerts }}
+        <label for="{{ form.subscribe_alerts.id_for_label }}" style="display:inline;font-weight:600;">
+          {{ form.subscribe_alerts.label }}
+        </label>
+        <p class="hint" style="margin-top:.25rem;">We will email you whenever a new scholarship is detected that matches your profile. No spam — only relevant alerts. Requires a valid email address above.</p>
+        {% if form.subscribe_alerts.errors %}<span class="err">{{ form.subscribe_alerts.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" style="margin-top:2rem;">
+    <button class="btn btn-lg" type="submit">Show Matching Schemes &rarr;</button>
+    <a href="{% url 'core:home' %}" class="btn btn-ghost">Cancel</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // 1. Auto-calculate age from date of birth
+  (function() {
+    const dobInput = document.getElementById('id_dob');
+    const ageInput = document.getElementById('id_age');
+    if (dobInput && ageInput) {
+      dobInput.addEventListener('change', function() {
+        if (!this.value) return;
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        if (age >= 0 && age <= 120) {
+          ageInput.value = age;
+        }
+      });
+    }
+  })();
+
+  // 2. Dynamic repeatable rows removal
+  function removeRepeatableRow(btn) {
+    const item = btn.closest('.repeatable-item');
+    const container = item.parentElement;
+    if (container.children.length > 1) {
+      item.remove();
+      renumberBadges(container);
+    } else {
+      // Clear inputs instead of removing the last remaining row
+      item.querySelectorAll('input').forEach(i => i.value = '');
+    }
+  }
+
+  function renumberBadges(container) {
+    const isInst = container.id === 'institutionsContainer';
+    const prefix = isInst ? 'Institution #' : 'Achievement #';
+    Array.from(container.children).forEach((child, idx) => {
+      const badge = child.querySelector('.repeatable-item-badge');
+      if (badge) badge.textContent = prefix + (idx + 1);
+    });
+  }
+
+  // 3. Dynamic row addition (Vanilla JS, 0 dependencies)
+  document.getElementById('btnAddInstitution').addEventListener('click', function() {
+    const container = document.getElementById('institutionsContainer');
+    const count = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'repeatable-item';
+    div.innerHTML = `
+      <div class="repeatable-item-head">
+        <span class="repeatable-item-badge">Institution #${count}</span>
+        <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Institution name</label>
+          <input type="text" name="inst_name" placeholder="e.g. Delhi Public School / DBS Global University">
+        </div>
+        <div class="field">
+          <label>Institution type</label>
+          <select name="inst_type">
+            {% for code, label in institution_types %}
+              <option value="{{ code }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Board / Affiliation</label>
+          <input type="text" name="inst_board" placeholder="e.g. CBSE / State Board / AICTE">
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input type="text" name="inst_city" placeholder="e.g. Dehradun">
+        </div>
+        <div class="field">
+          <label>State</label>
+          <input type="text" name="inst_state" placeholder="e.g. Uttarakhand">
+        </div>
+        <div class="field">
+          <label>Years attended</label>
+          <input type="text" name="inst_years" placeholder="e.g. 2021-2023">
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('btnAddAchievement').addEventListener('click', function() {
+    const container = document.getElementById('achievementsContainer');
+    const count = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'repeatable-item';
+    div.innerHTML = `
+      <div class="repeatable-item-head">
+        <span class="repeatable-item-badge">Achievement #${count}</span>
+        <button type="button" class="btn btn-outline-danger btn-remove-row" onclick="removeRepeatableRow(this)">Remove</button>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="ach_title" placeholder="e.g. State Science Olympiad Gold Medal">
+        </div>
+        <div class="field">
+          <label>Level</label>
+          <select name="ach_level">
+            {% for code, label in achievement_levels %}
+              <option value="{{ code }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <input type="text" name="ach_year" placeholder="e.g. 2024">
+        </div>
+        <div class="field col-span-full">
+          <label>Description / Organizing Body</label>
+          <input type="text" name="ach_desc" placeholder="Details, rank, or award description">
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+</script>
+{% endblock %}

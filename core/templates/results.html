@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Scholarship Matches for You · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+  <div>
+    <h1 class="page-title">Scholarship Matches for You</h1>
+    <p class="lede" style="margin-bottom:0.5rem;">
+      Matched against profile: <strong>{{ profile.name|default:"Student" }}</strong>
+      {% if profile.current_institution %}&bull; <span>{{ profile.current_institution }}</span>{% endif %}
+      {% if profile.education_level %}&bull; <span style="text-transform:capitalize;">{{ profile.education_level }}</span>{% endif %}
+    </p>
+  </div>
+  <div>
+    <a class="btn btn-ghost btn-sm" href="{% url 'core:check' %}">&larr; Edit Student Profile</a>
+  </div>
+</div>
+
+<h2 class="section-h ok">
+  <span>✓ Eligible Scholarships ({{ eligible|length }})</span>
+  <span class="pill pill-ok">Ready for In-App Application</span>
+</h2>
+
+{% if eligible %}
+  {% for item in eligible %}
+    <div class="card scheme-card">
+      <div class="scheme-head">
+        <div>
+          <h3><a href="{% url 'core:scheme_detail' item.scheme.pk %}">{{ item.scheme.name }}</a></h3>
+          {% if item.scheme.department %}
+            <p class="muted" style="margin:2px 0 0; font-size:0.875rem;">{{ item.scheme.department }}</p>
+          {% endif %}
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          {% if item.scheme.restrict_to_listed_institutions %}
+            <span class="pill pill-gold">Approved Institutions Only</span>
+          {% endif %}
+          <span class="pill pill-ok">Eligible</span>
+        </div>
+      </div>
+
+      <p style="margin:0.5rem 0 0.75rem; color:var(--ink);">{{ item.scheme.short_desc }}</p>
+
+      <ul class="reasons">
+        {% for status, text in item.reasons %}
+          <li class="r-{{ status }}">{{ text }}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="actions">
+        <a class="btn btn-sm btn-success" href="{% url 'core:apply' item.scheme.pk %}">Apply here</a>
+        <a class="btn btn-sm btn-ghost" href="{% url 'core:scheme_detail' item.scheme.pk %}">Explain in simple words</a>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty">
+    <p style="margin:0; font-size:1.05rem;"><strong>No fully matching schemes found for your current profile.</strong></p>
+    <p style="margin:6px 0 0; font-size:0.9rem;">Review the near-matches below to see why certain criteria were not met, or edit your profile details.</p>
+  </div>
+{% endif %}
+
+{% if others %}
+  <h2 class="section-h" style="margin-top:2.5rem;">
+    <span>Close, But Not Qualified ({{ others|length }})</span>
+    <span class="pill pill-warn">Criteria Mismatch</span>
+  </h2>
+
+  {% for item in others %}
+    <div class="card scheme-card dim">
+      <div class="scheme-head">
+        <div>
+          <h3><a href="{% url 'core:scheme_detail' item.scheme.pk %}">{{ item.scheme.name }}</a></h3>
+          {% if item.scheme.department %}
+            <p class="muted" style="margin:2px 0 0; font-size:0.875rem;">{{ item.scheme.department }}</p>
+          {% endif %}
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          {% if item.scheme.restrict_to_listed_institutions %}
+            <span class="pill pill-gold">Institution Restricted</span>
+          {% endif %}
+          <span class="pill pill-warn">Not Eligible</span>
+        </div>
+      </div>
+
+      <p style="margin:0.5rem 0 0.75rem; color:var(--muted); font-size:0.9375rem;">{{ item.scheme.short_desc }}</p>
+
+      <ul class="reasons">
+        {% for status, text in item.fails %}
+          <li class="r-fail">{{ text }}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="actions">
+        <a class="btn btn-sm btn-ghost" href="{% url 'core:scheme_detail' item.scheme.pk %}">View scheme rules</a>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

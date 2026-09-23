@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ scheme.name }} · Details &amp; Rules · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'core:results' %}">&larr; Back to matching scholarships</a>
+
+<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; margin-bottom:0.75rem;">
+  <div>
+    <h1 class="page-title">{{ scheme.name }}</h1>
+    {% if scheme.department %}
+      <p class="muted" style="margin:0; font-size:0.95rem;">{{ scheme.department }} &bull; {{ scheme.domain }}</p>
+    {% endif %}
+  </div>
+  <div>
+    <a class="btn btn-success btn-lg" href="{% url 'core:apply' scheme.pk %}">Apply here &rarr;</a>
+  </div>
+</div>
+
+<div class="card explain">
+  <h2 class="section-h" style="margin-top:0;">In Plain Words</h2>
+  {% for line in explanation %}
+    <p>{{ line }}</p>
+  {% endfor %}
+</div>
+
+<!-- Approved Institutions List or Open Status -->
+<div class="card" style="border-left: 4px solid var(--navy);">
+  <h3 style="margin-top:0; color:var(--navy); display:flex; align-items:center; gap:8px;">
+    <span>Eligible Schools &amp; Colleges</span>
+    {% if scheme.restrict_to_listed_institutions %}
+      <span class="pill pill-gold">Restricted to Approved Institutions</span>
+    {% else %}
+      <span class="pill pill-ok">All Recognized Institutions Accepted</span>
+    {% endif %}
+  </h3>
+
+  {% if scheme.restrict_to_listed_institutions %}
+    <p style="margin-bottom:0.85rem; color:var(--muted); font-size:0.925rem;">
+      This scholarship requires students to be enrolled in or have attended one of the following partner / approved institutions:
+    </p>
+    {% if approved_institutions %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Approved Institution Name</th>
+              <th>City</th>
+              <th>State</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inst in approved_institutions %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><strong>{{ inst.name }}</strong></td>
+                <td>{{ inst.city|default:"—" }}</td>
+                <td>{{ inst.state|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No specific institutions are currently restricted in the system. Any accredited institution is accepted.</p>
+    {% endif %}
+  {% else %}
+    <p style="margin:0; color:var(--ok); font-weight:600;">
+      ✓ Open to students from all accredited schools, colleges, and universities across India.
+    </p>
+  {% endif %}
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3 style="margin-top:0; color:var(--navy);">Benefits</h3>
+    <ul class="ticks">
+      {% for b in scheme.benefit_list %}
+        <li>{{ b }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0; color:var(--navy);">Documents to Keep Ready</h3>
+    <ul class="ticks">
+      {% for d in scheme.document_list %}
+        <li>{{ d }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="card" style="background:var(--navy-soft); text-align:center; padding:2rem 1.5rem;">
+  <h3 style="margin:0 0 0.5rem; color:var(--navy);">Ready to apply for this scholarship?</h3>
+  <p style="margin:0 0 1.25rem; color:var(--muted); font-size:0.95rem;">
+    Submit your application directly through SchemeSetu with your auto-filled profile and get an instant DAC tracking ID.
+  </p>
+  <a class="btn btn-success btn-lg" href="{% url 'core:apply' scheme.pk %}">Apply here</a>
+</div>
+{% endblock %}

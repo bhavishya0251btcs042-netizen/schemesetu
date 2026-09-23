@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Track Application · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Track Application Status</h1>
+<p class="lede">Enter your DAC tracking ID to review real-time status, verification progress, and your submitted student profile.</p>
+
+<form method="get" class="card form-inline" style="margin-bottom:1.5rem;">
+  <div class="field" style="flex:1 1 300px;">
+    <label for="tid">Enter your 9-character Tracking ID</label>
+    <input type="text" id="tid" name="tracking_id" value="{{ tracking_id }}" placeholder="e.g. DAC1A2B3C" required style="text-transform:uppercase;">
+  </div>
+  <button class="btn btn-lg" type="submit">Track Application</button>
+</form>
+
+{% if application %}
+  <div class="card success-card" style="margin-top:1.5rem;">
+    <div class="scheme-head">
+      <div>
+        <h2 style="margin:0 0 4px; font-size:1.35rem; color:var(--navy);">{{ application.scheme.name }}</h2>
+        <span class="muted" style="font-size:0.875rem;">Tracking ID: <strong>{{ application.tracking_id }}</strong> &bull; Submitted on {{ application.created_at|date:"d M Y, H:i" }}</span>
+      </div>
+      <div>
+        {% if application.status == 'approved' %}
+          <span class="pill pill-ok">Status: {{ application.get_status_display }}</span>
+        {% elif application.status == 'rejected' %}
+          <span class="pill pill-warn">Status: {{ application.get_status_display }}</span>
+        {% elif application.status == 'under_review' %}
+          <span class="pill pill-gold">Status: {{ application.get_status_display }}</span>
+        {% else %}
+          <span class="pill pill-ok">Status: {{ application.get_status_display }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem; color:var(--navy); margin-top:1.25rem;">Applicant &amp; Academic Summary</h3>
+    <div class="grid-2">
+      <table class="kv">
+        <tr><th>Applicant Name</th><td><strong>{{ application.applicant_name }}</strong></td></tr>
+        <tr><th>Age / Gender</th><td>{{ application.age }} yrs &bull; {{ application.get_gender_display }}</td></tr>
+        <tr><th>Category</th><td>{{ application.get_category_display }}</td></tr>
+        <tr><th>Family Income</th><td>Rs {{ application.annual_income|floatformat:0 }} / yr</td></tr>
+        <tr><th>Aadhaar Linked</th><td>{% if application.aadhaar_linked %}✓ Yes (DBT Active){% else %}No{% endif %}</td></tr>
+      </table>
+
+      <table class="kv">
+        <tr><th>Education Level</th><td>{{ application.get_education_level_display }}</td></tr>
+        <tr><th>Course &amp; Year</th><td>{{ application.current_course|default:"—" }} ({{ application.current_year|default:"—" }})</td></tr>
+        <tr><th>Institution</th><td><strong>{{ application.current_institution|default:"—" }}</strong></td></tr>
+        <tr><th>Latest Score</th><td>{{ application.latest_percentage|default:"—" }}</td></tr>
+        <tr><th>Location</th><td>{{ application.district }}{% if application.district and application.state %}, {% endif %}{{ application.state }}</td></tr>
+      </table>
+    </div>
+
+    {% if application.institutions_attended.all %}
+      <h4 style="margin:1.25rem 0 0.5rem; color:var(--navy);">Institutions Attended:</h4>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Institution</th>
+              <th>Type</th>
+              <th>Board</th>
+              <th>City / State</th>
+              <th>Years</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inst in application.institutions_attended.all %}
+              <tr>
+                <td><strong>{{ inst.name }}</strong></td>
+                <td>{{ inst.get_institution_type_display }}</td>
+                <td>{{ inst.board_affiliation|default:"—" }}</td>
+                <td>{{ inst.city }}{% if inst.city and inst.state %}, {% endif %}{{ inst.state }}</td>
+                <td>{{ inst.years_attended|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    {% if application.achievements.all %}
+      <h4 style="margin:1.25rem 0 0.5rem; color:var(--navy);">Academic Achievements:</h4>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Achievement</th>
+              <th>Level</th>
+              <th>Year</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ach in application.achievements.all %}
+              <tr>
+                <td><strong>{{ ach.title }}</strong></td>
+                <td><span class="pill">{{ ach.get_level_display }}</span></td>
+                <td>{{ ach.year|default:"—" }}</td>
+                <td>{{ ach.description|default:"—" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    <div class="actions" style="margin-top:1.5rem;">
+      <a class="btn btn-sm btn-ghost" href="{% url 'core:application_detail' application.tracking_id %}">View Print-friendly Confirmation</a>
+    </div>
+  </div>
+{% endif %}
+
+{% if recent %}
+  <h2 class="section-h" style="margin-top:2.5rem;">Recent Applications in System</h2>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tracking ID</th>
+          <th>Applicant</th>
+          <th>Scholarship Scheme</th>
+          <th>Institution</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in recent %}
+          <tr>
+            <td>
+              <a href="{% url 'core:track' %}?tracking_id={{ a.tracking_id }}" style="font-weight:700; font-family:monospace;">
+                {{ a.tracking_id }}
+              </a>
+            </td>
+            <td>{{ a.applicant_name }}</td>
+            <td>{{ a.scheme.name }}</td>
+            <td>{{ a.current_institution|default:"—" }}</td>
+            <td>
+              {% if a.status == 'approved' %}
+                <span class="pill pill-ok">{{ a.get_status_display }}</span>
+              {% elif a.status == 'rejected' %}
+                <span class="pill pill-warn">{{ a.get_status_display }}</span>
+              {% else %}
+                <span class="pill">{{ a.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td>{{ a.created_at|date:"d M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

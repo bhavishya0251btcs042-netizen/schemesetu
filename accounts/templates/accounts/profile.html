@@ -1,0 +1,73 @@
+﻿{% extends "base.html" %}
+{% block title %}My Profile · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrap" style="max-width:44rem;">
+
+  <h1 class="page-title">👤 My Account</h1>
+
+  <div class="card" style="padding:1.75rem;margin-bottom:1.5rem;">
+    <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+      <div class="avatar-circle">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+      <div>
+        <p style="margin:0;font-size:1.25rem;font-weight:700;">
+          {{ user.get_full_name|default:user.username }}
+        </p>
+        <p style="margin:0;color:var(--clr-muted,#666);font-size:.9rem;">@{{ user.username }}</p>
+      </div>
+      <a href="{% url 'accounts:logout' %}" class="btn btn-ghost" style="margin-left:auto;">Logout</a>
+    </div>
+
+    <table class="table-responsive" style="width:100%;border-collapse:collapse;">
+      <tbody>
+        <tr>
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;width:40%;">Email</th>
+          <td style="padding:.6rem .5rem;">{{ user.email|default:"—" }}</td>
+        </tr>
+        <tr style="background:#f9f9f9;">
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;">Username</th>
+          <td style="padding:.6rem .5rem;">{{ user.username }}</td>
+        </tr>
+        <tr>
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;">First Name</th>
+          <td style="padding:.6rem .5rem;">{{ user.first_name|default:"—" }}</td>
+        </tr>
+        <tr style="background:#f9f9f9;">
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;">Last Name</th>
+          <td style="padding:.6rem .5rem;">{{ user.last_name|default:"—" }}</td>
+        </tr>
+        <tr>
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;">Member since</th>
+          <td style="padding:.6rem .5rem;">{{ user.date_joined|date:"d M Y" }}</td>
+        </tr>
+        <tr style="background:#f9f9f9;">
+          <th style="text-align:left;padding:.6rem .5rem;color:#555;font-weight:600;">Account status</th>
+          <td style="padding:.6rem .5rem;">
+            {% if user.is_active %}
+              <span style="color:#2b8a3e;font-weight:600;">✅ Active</span>
+            {% else %}
+              <span style="color:#e53e3e;">⛔ Inactive</span>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- JWT info -->
+  <div class="card" style="padding:1.25rem;background:var(--clr-surface,#f0f4f8);">
+    <p style="margin:0;font-size:.875rem;color:#555;">
+      🔒 <strong>Session security:</strong> You are authenticated via a signed JWT stored in an
+      <code>httpOnly</code> cookie. Your session cannot be read by JavaScript, protecting you
+      against XSS attacks. Token auto-refreshes every 15 minutes.
+    </p>
+  </div>
+
+  <div class="actions" style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;">
+    <a href="{% url 'core:check' %}" class="btn">Check Eligibility</a>
+    <a href="{% url 'core:notifications' %}" class="btn btn-ghost">🔔 My Alerts</a>
+    <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger" style="margin-left:auto;">Logout</a>
+  </div>
+
+</div>
+{% endblock %}

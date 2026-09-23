@@ -1,0 +1,121 @@
+﻿{% extends "base.html" %}
+{% block title %}🔔 My Scholarship Alerts · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">🔔 Scholarship Alert Centre</h1>
+<p class="lede">
+  Enter your registered email address to view all personalised scholarship notifications. New alerts are sent automatically whenever a matching scheme is detected on any government portal.
+</p>
+
+<!-- Email search form -->
+<form method="get" class="form" style="max-width:36rem;margin-bottom:2rem;">
+  <div class="form-grid" style="grid-template-columns:1fr auto;gap:.75rem;align-items:end;">
+    <div class="field" style="margin-bottom:0;">
+      <label for="emailInput">Your registered email address</label>
+      <input
+        id="emailInput"
+        type="email"
+        name="email"
+        value="{{ email_query }}"
+        placeholder="e.g. student@dbs.edu.in"
+        autocomplete="email"
+        autofocus
+      >
+    </div>
+    <button class="btn" type="submit" style="height:2.75rem;white-space:nowrap;">View Alerts</button>
+  </div>
+</form>
+
+{% if email_query and not subscriber %}
+  <div class="card" style="border-left:4px solid var(--clr-warn,#e07b00);padding:1.25rem 1.5rem;">
+    <strong>Not found.</strong> No active subscriber is registered with <code>{{ email_query }}</code>.
+    To register for alerts, tick the <em>"Subscribe to scholarship alerts"</em> checkbox when you
+    <a href="{% url 'core:check' %}">check eligibility</a> or
+    <a href="{% url 'core:home' %}">apply for a scheme</a>.
+  </div>
+
+{% elif subscriber %}
+
+  <!-- Subscriber summary card -->
+  <div class="card" style="margin-bottom:2rem;padding:1.25rem 1.5rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;">
+      <div>
+        <p style="margin:0 0 .25rem;"><strong>{{ subscriber.name }}</strong></p>
+        <p style="margin:0;color:var(--clr-muted,#666);font-size:.875rem;">
+          {{ subscriber.email }} &nbsp;·&nbsp;
+          {{ subscriber.education_level|title }} &nbsp;·&nbsp;
+          {{ subscriber.state }}
+        </p>
+      </div>
+      <span class="badge {% if subscriber.is_active %}badge-success{% else %}badge-muted{% endif %}" style="white-space:nowrap;">
+        {% if subscriber.is_active %}✅ Alerts active{% else %}⛔ Unsubscribed{% endif %}
+      </span>
+    </div>
+  </div>
+
+  {% if notifications %}
+    <h2 style="font-size:1.125rem;margin-bottom:1rem;">
+      {{ notifications|length }} notification{{ notifications|length|pluralize }} for you
+    </h2>
+
+    <div style="display:flex;flex-direction:column;gap:1.25rem;">
+      {% for note in notifications %}
+        <div class="card" style="padding:1.25rem 1.5rem;border-left:4px solid var(--clr-accent,#1a5c96);">
+
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;">
+            <h3 style="margin:0;font-size:1rem;">{{ note.scheme.name }}</h3>
+            <time style="font-size:.8rem;color:var(--clr-muted,#666);white-space:nowrap;">
+              {{ note.created_at|date:"d M Y, g:i A" }}
+            </time>
+          </div>
+
+          <p style="margin:0 0 .75rem;color:var(--clr-muted,#555);font-size:.9rem;">
+            {{ note.scheme.short_desc }}
+          </p>
+
+          {% if note.match_reasons %}
+            <details style="margin-bottom:.75rem;">
+              <summary style="cursor:pointer;font-size:.85rem;color:var(--clr-accent,#1a5c96);font-weight:600;">
+                Why you matched →
+              </summary>
+              <ul style="margin:.5rem 0 0 1.25rem;padding:0;font-size:.85rem;color:#444;">
+                {% for reason in note.match_reasons_list %}
+                  <li>{{ reason }}</li>
+                {% empty %}
+                  <li>Eligibility criteria matched your profile.</li>
+                {% endfor %}
+              </ul>
+            </details>
+          {% endif %}
+
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+            <a href="{% url 'core:scheme_detail' note.scheme.pk %}" class="btn btn-sm">View scheme details</a>
+            <a href="{% url 'core:apply' note.scheme.pk %}" class="btn btn-success btn-sm">Apply now →</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="card" style="padding:1.5rem;text-align:center;color:var(--clr-muted,#666);">
+      <p style="font-size:2rem;margin:0 0 .5rem;">📭</p>
+      <p style="margin:0;">No alerts yet. Run <code>python manage.py sync_scholarships --notify-all</code> to trigger a check, or wait for the next automatic sync.</p>
+    </div>
+  {% endif %}
+
+{% else %}
+  <!-- Landing state — no email entered -->
+  <div class="card" style="padding:1.5rem 1.75rem;max-width:44rem;">
+    <h2 style="margin:0 0 .75rem;font-size:1.1rem;">How it works</h2>
+    <ol style="margin:0;padding-left:1.25rem;line-height:1.9;color:#444;">
+      <li>Fill your profile and tick <strong>"Subscribe to scholarship alerts"</strong> when you check eligibility.</li>
+      <li>Our engine automatically scans government portals (NSP, AICTE, NTA, scholarships.gov.in) for new schemes.</li>
+      <li>When a new matching scholarship is found, you are alerted instantly — no need to check portals yourself.</li>
+      <li>Come back here any time and enter your email to see all notifications in one place.</li>
+    </ol>
+    <p style="margin:1rem 0 0;font-size:.875rem;color:var(--clr-muted,#666);">
+      📌 Alerts are sent to the email you provide. For offline / demo mode, notifications are printed in the server terminal window.
+    </p>
+  </div>
+{% endif %}
+{% endblock %}

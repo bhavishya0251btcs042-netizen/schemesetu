@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+{% block title %}Apply for {{ scheme.name }} · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<a class="back" href="{% url 'core:scheme_detail' scheme.pk %}">&larr; Back to scheme details</a>
+
+<h1 class="page-title">Apply &mdash; {{ scheme.name }}</h1>
+<p class="lede">Complete your formal in-app application. Information is pre-filled from your profile check &mdash; review, update, and submit to generate your verified DAC tracking ID.</p>
+
+<form method="post" class="form" id="applicationForm" novalidate>
+  {% csrf_token %}
+
+  <!-- 1. PERSONAL INFORMATION -->
+  <div class="form-section">
+    <h2 class="form-section-title">1. Personal Information</h2>
+    <p class="form-section-desc">Applicant identity and contact details.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.applicant_name.id_for_label }}">{{ form.applicant_name.label }} *</label>
+        {{ form.applicant_name }}
+        {% if form.applicant_name.errors %}<span class="err">{{ form.applicant_name.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }} <span class="hint">(auto-calculates age)</span></label>
+        {{ form.date_of_birth }}
+        {% if form.date_of_birth.errors %}<span class="err">{{ form.date_of_birth.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.age.id_for_label }}">{{ form.age.label }} *</label>
+        {{ form.age }}
+        {% if form.age.errors %}<span class="err">{{ form.age.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }} *</label>
+        {{ form.gender }}
+        {% if form.gender.errors %}<span class="err">{{ form.gender.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.category.id_for_label }}">{{ form.category.label }} *</label>
+        {{ form.category }}
+        {% if form.category.errors %}<span class="err">{{ form.category.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.annual_income.id_for_label }}">{{ form.annual_income.label }} *</label>
+        {{ form.annual_income }}
+        {% if form.annual_income.errors %}<span class="err">{{ form.annual_income.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.state.id_for_label }}">{{ form.state.label }}</label>
+        {{ form.state }}
+        {% if form.state.errors %}<span class="err">{{ form.state.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.district.id_for_label }}">{{ form.district.label }}</label>
+        {{ form.district }}
+        {% if form.district.errors %}<span class="err">{{ form.district.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}<span class="err">{{ form.phone.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {{ form.email }}
+        {% if form.email.errors %}<span class="err">{{ form.email.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.disability_status.id_for_label }}">{{ form.disability_status.label }}</label>
+        {{ form.disability_status }}
+        {% if form.disability_status.errors %}<span class="err">{{ form.disability_status.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+        {{ form.address }}
+        {% if form.address.errors %}<span class="err">{{ form.address.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field checkbox-field col-span-full">
+        {{ form.aadhaar_linked }}
+        <label for="{{ form.aadhaar_linked.id_for_label }}">{{ form.aadhaar_linked.label }}</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ACADEMIC DETAILS -->
+  <div class="form-section">
+    <h2 class="form-section-title">2. Academic Information</h2>
+    <p class="form-section-desc">Course, current institution, and qualification records.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.education_level.id_for_label }}">{{ form.education_level.label }} *</label>
+        {{ form.education_level }}
+        {% if form.education_level.errors %}<span class="err">{{ form.education_level.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_course.id_for_label }}">{{ form.current_course.label }}</label>
+        {{ form.current_course }}
+        {% if form.current_course.errors %}<span class="err">{{ form.current_course.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_institution.id_for_label }}">{{ form.current_institution.label }}</label>
+        {{ form.current_institution }}
+        {% if form.current_institution.errors %}<span class="err">{{ form.current_institution.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.current_year.id_for_label }}">{{ form.current_year.label }}</label>
+        {{ form.current_year }}
+        {% if form.current_year.errors %}<span class="err">{{ form.current_year.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.latest_percentage.id_for_label }}">{{ form.latest_percentage.label }}</label>
+        {{ form.latest_percentage }}
+        {% if form.latest_percentage.errors %}<span class="err">{{ form.latest_percentage.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem; margin:1.5rem 0 0.75rem; color:var(--navy);">Past Qualifications</h3>
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.board_10th.id_for_label }}">{{ form.board_10th.label }}</label>
+        {{ form.board_10th }}
+        {% if form.board_10th.errors %}<span class="err">{{ form.board_10th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.percentage_10th.id_for_label }}">{{ form.percentage_10th.label }}</label>
+        {{ form.percentage_10th }}
+        {% if form.percentage_10th.errors %}<span class="err">{{ form.percentage_10th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.board_12th.id_for_label }}">{{ form.board_12th.label }}</label>
+        {{ form.board_12th }}
+        {% if form.board_12th.errors %}<span class="err">{{ form.board_12th.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.percentage_12th.id_for_label }}">{{ form.percentage_12th.label }}</label>
+        {{ form.percentage_12th }}
+        {% if form.percentage_12th.errors %}<span class="err">{{ form.percentage_12th.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SCHOOLS & COLLEGES ATTENDED (FORMSET) -->
+  <div class="form-section">
+    <h2 class="form-section-title">3. Schools &amp; Colleges Attended</h2>
+    <p class="form-section-desc">Record of all academic institutions attended.</p>
+
+    {{ institution_formset.management_form }}
+    <div id="institutionsFormsetContainer" class="repeatable-group">
+      {% for iform in institution_formset %}
+        <div class="repeatable-item institution-formset-row" data-prefix="institutions">
+          {{ iform.id }}
+          <div class="repeatable-item-head">
+            <span class="repeatable-item-badge">Institution #{{ forloop.counter }}</span>
+            {% if iform.instance.pk %}
+              <label class="delete-checkbox-wrap">
+                {{ iform.DELETE }} Delete
+              </label>
+            {% else %}
+              <button type="button" class="btn btn-outline-danger btn-remove-formset-row" onclick="removeFormsetRow(this, 'institutions')">Remove</button>
+            {% endif %}
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="{{ iform.name.id_for_label }}">Institution name *</label>
+              {{ iform.name }}
+              {% if iform.name.errors %}<span class="err">{{ iform.name.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ iform.institution_type.id_for_label }}">Type</label>
+              {{ iform.institution_type }}
+              {% if iform.institution_type.errors %}<span class="err">{{ iform.institution_type.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ iform.board_affiliation.id_for_label }}">Board / Affiliation</label>
+              {{ iform.board_affiliation }}
+              {% if iform.board_affiliation.errors %}<span class="err">{{ iform.board_affiliation.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ iform.city.id_for_label }}">City</label>
+              {{ iform.city }}
+              {% if iform.city.errors %}<span class="err">{{ iform.city.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ iform.state.id_for_label }}">State</label>
+              {{ iform.state }}
+              {% if iform.state.errors %}<span class="err">{{ iform.state.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ iform.years_attended.id_for_label }}">Years attended</label>
+              {{ iform.years_attended }}
+              {% if iform.years_attended.errors %}<span class="err">{{ iform.years_attended.errors|striptags }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="repeatable-actions">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addFormsetRow('institutions', 'institutionsFormsetContainer')">+ Add Another School / College</button>
+    </div>
+  </div>
+
+  <!-- 4. ACADEMIC ACHIEVEMENTS (FORMSET) -->
+  <div class="form-section">
+    <h2 class="form-section-title">4. Academic Achievements</h2>
+    <p class="form-section-desc">Distinctions, certifications, competitive exam ranks, and honours.</p>
+
+    {{ achievement_formset.management_form }}
+    <div id="achievementsFormsetContainer" class="repeatable-group">
+      {% for aform in achievement_formset %}
+        <div class="repeatable-item achievement-formset-row" data-prefix="achievements">
+          {{ aform.id }}
+          <div class="repeatable-item-head">
+            <span class="repeatable-item-badge">Achievement #{{ forloop.counter }}</span>
+            {% if aform.instance.pk %}
+              <label class="delete-checkbox-wrap">
+                {{ aform.DELETE }} Delete
+              </label>
+            {% else %}
+              <button type="button" class="btn btn-outline-danger btn-remove-formset-row" onclick="removeFormsetRow(this, 'achievements')">Remove</button>
+            {% endif %}
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="{{ aform.title.id_for_label }}">Title *</label>
+              {{ aform.title }}
+              {% if aform.title.errors %}<span class="err">{{ aform.title.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ aform.level.id_for_label }}">Level</label>
+              {{ aform.level }}
+              {% if aform.level.errors %}<span class="err">{{ aform.level.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ aform.year.id_for_label }}">Year</label>
+              {{ aform.year }}
+              {% if aform.year.errors %}<span class="err">{{ aform.year.errors|striptags }}</span>{% endif %}
+            </div>
+            <div class="field col-span-full">
+              <label for="{{ aform.description.id_for_label }}">Description / Organizing body</label>
+              {{ aform.description }}
+              {% if aform.description.errors %}<span class="err">{{ aform.description.errors|striptags }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="repeatable-actions">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="addFormsetRow('achievements', 'achievementsFormsetContainer')">+ Add Another Achievement</button>
+    </div>
+  </div>
+
+  <!-- 5. PROFESSIONAL & OTHER DETAILS -->
+  <div class="form-section">
+    <h2 class="form-section-title">5. Professional Status &amp; Prior Scholarships</h2>
+    <p class="form-section-desc">Current employment status and prior assistance records.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="{{ form.employment_status.id_for_label }}">{{ form.employment_status.label }}</label>
+        {{ form.employment_status }}
+        {% if form.employment_status.errors %}<span class="err">{{ form.employment_status.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.achievements_notes.id_for_label }}">{{ form.achievements_notes.label }}</label>
+        {{ form.achievements_notes }}
+        {% if form.achievements_notes.errors %}<span class="err">{{ form.achievements_notes.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field col-span-full">
+        <label for="{{ form.scholarships_availed.id_for_label }}">{{ form.scholarships_availed.label }}</label>
+        {{ form.scholarships_availed }}
+        {% if form.scholarships_availed.errors %}<span class="err">{{ form.scholarships_availed.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. SCHOLARSHIP ALERTS OPT-IN -->
+  <div class="form-section">
+    <h2 class="form-section-title">6. Scholarship Alert Notifications</h2>
+    <p class="form-section-desc">Stay informed about new scholarships matching your profile on any platform — automatically.</p>
+    <div class="form-grid">
+      <div class="field col-span-full checkbox-field">
+        {{ form.subscribe_alerts }}
+        <label for="{{ form.subscribe_alerts.id_for_label }}" style="display:inline;font-weight:600;">
+          {{ form.subscribe_alerts.label }}
+        </label>
+        <p class="hint" style="margin-top:.25rem;">We'll alert you by email whenever a new matching scholarship is detected. Requires a valid email address in Section 1.</p>
+        {% if form.subscribe_alerts.errors %}<span class="err">{{ form.subscribe_alerts.errors|striptags }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" style="margin-top:2rem;">
+    <button class="btn btn-success btn-lg" type="submit">Submit Application &amp; Get Tracking ID &rarr;</button>
+    <a href="{% url 'core:scheme_detail' scheme.pk %}" class="btn btn-ghost">Cancel</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // 1. Auto-calc age from date of birth
+  (function() {
+    const dobInput = document.getElementById('id_app_dob');
+    const ageInput = document.getElementById('id_app_age');
+    if (dobInput && ageInput) {
+      dobInput.addEventListener('change', function() {
+        if (!this.value) return;
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        if (age >= 0 && age <= 120) {
+          ageInput.value = age;
+        }
+      });
+    }
+  })();
+
+  // 2. Dynamic Formset row addition
+  function addFormsetRow(prefix, containerId) {
+    const container = document.getElementById(containerId);
+    const totalFormsInput = document.getElementById('id_' + prefix + '-TOTAL_FORMS');
+    if (!container || !totalFormsInput) return;
+
+    const currentCount = parseInt(totalFormsInput.value, 10);
+    const rows = container.querySelectorAll('.repeatable-item');
+    if (rows.length === 0) return;
+
+    const templateRow = rows[0].cloneNode(true);
+
+    // Update form index in name, id, for attributes
+    const regex = new RegExp(prefix + '-\\d+-', 'g');
+    const newPrefix = prefix + '-' + currentCount + '-';
+
+    templateRow.querySelectorAll('input, select, textarea, label').forEach(el => {
+      if (el.name) el.name = el.name.replace(regex, newPrefix);
+      if (el.id) el.id = el.id.replace(regex, newPrefix);
+      if (el.htmlFor) el.htmlFor = el.htmlFor.replace(regex, newPrefix);
+
+      // Clear input values, uncheck checkboxes
+      if (el.tagName === 'INPUT') {
+        if (el.type === 'checkbox') {
+          el.checked = false;
+        } else if (el.type === 'hidden' && el.name.endsWith('-id')) {
+          el.value = '';
+        } else {
+          el.value = '';
+        }
+      } else if (el.tagName === 'SELECT') {
+        el.selectedIndex = 0;
+      } else if (el.tagName === 'TEXTAREA') {
+        el.value = '';
+      }
+    });
+
+    // Remove any error messages from the clone
+    templateRow.querySelectorAll('.err').forEach(el => el.remove());
+
+    // Update header badge
+    const badge = templateRow.querySelector('.repeatable-item-badge');
+    const labelPrefix = prefix === 'institutions' ? 'Institution #' : 'Achievement #';
+    if (badge) badge.textContent = labelPrefix + (currentCount + 1);
+
+    // Ensure remove button is configured
+    let head = templateRow.querySelector('.repeatable-item-head');
+    let delWrap = head.querySelector('.delete-checkbox-wrap');
+    if (delWrap) delWrap.remove();
+
+    let removeBtn = head.querySelector('.btn-remove-formset-row');
+    if (!removeBtn) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-outline-danger btn-remove-formset-row';
+      btn.textContent = 'Remove';
+      btn.setAttribute('onclick', `removeFormsetRow(this, '${prefix}')`);
+      head.appendChild(btn);
+    }
+
+    container.appendChild(templateRow);
+    totalFormsInput.value = currentCount + 1;
+  }
+
+  // 3. Remove Formset row
+  function removeFormsetRow(btn, prefix) {
+    const row = btn.closest('.repeatable-item');
+    const container = row.parentElement;
+    const rows = container.querySelectorAll('.repeatable-item');
+
+    if (rows.length > 1) {
+      row.remove();
+      // Renumber badges
+      const labelPrefix = prefix === 'institutions' ? 'Institution #' : 'Achievement #';
+      container.querySelectorAll('.repeatable-item').forEach((r, idx) => {
+        const badge = r.querySelector('.repeatable-item-badge');
+        if (badge) badge.textContent = labelPrefix + (idx + 1);
+      });
+    } else {
+      // Clear inputs instead of removing last row
+      row.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+      });
+    }
+  }
+</script>
+{% endblock %}

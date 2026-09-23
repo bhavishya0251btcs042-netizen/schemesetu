@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-icon">🔐</div>
+      <h1 class="auth-title">Verify your email</h1>
+      <p class="auth-subtitle">We sent a one-time password to <strong>{{ email }}</strong>.<br>Enter it below to complete registration.</p>
+    </div>
+
+    <!-- DEMO OTP BOX — prominently displayed for offline demo -->
+    <div class="otp-demo-box" role="note" aria-label="Demo OTP for testing">
+      <div class="otp-demo-label">🧪 Demo OTP (visible for testing)</div>
+      <div class="otp-demo-code" id="demoOtpCode">{{ demo_otp }}</div>
+      <button type="button" class="otp-copy-btn" onclick="copyOtp()">📋 Copy OTP</button>
+      <p class="otp-demo-note">In production, this would be sent silently via SMS/email. For offline demo, the OTP is shown here.</p>
+    </div>
+
+    <!-- OTP Entry Form -->
+    <form method="post" action="{% url 'accounts:otp_verify' %}" class="form auth-form" id="otpForm" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-error">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+
+      <div class="field" style="margin-bottom:1.25rem;">
+        <label for="{{ form.otp_code.id_for_label }}" style="font-weight:600;">Enter OTP</label>
+        {{ form.otp_code }}
+        {% if form.otp_code.errors %}<span class="err">{{ form.otp_code.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <!-- Countdown -->
+      <div class="otp-countdown" id="otpCountdown">
+        OTP expires in <strong id="countdownTimer">10:00</strong>
+      </div>
+
+      <div class="auth-actions">
+        <button type="submit" class="btn btn-lg btn-success" style="width:100%;">
+          Verify &amp; Create Account ✓
+        </button>
+      </div>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <a href="{% url 'accounts:signup' %}" style="font-size:.875rem;color:var(--clr-muted,#666);">← Go back and edit details</a>
+        &nbsp;·&nbsp;
+        <a href="{% url 'accounts:resend_otp' %}" style="font-size:.875rem;" id="resendLink">Resend OTP</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Auto-fill OTP when user clicks copy button
+  function copyOtp() {
+    const code = document.getElementById('demoOtpCode').textContent.trim();
+    const input = document.querySelector('.otp-input');
+    if (input) input.value = code;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => {});
+      }
+    } catch (e) {}
+    const btn = document.querySelector('.otp-copy-btn');
+    btn.textContent = '✅ Copied & Filled!';
+    setTimeout(() => btn.textContent = '📋 Copy OTP', 2000);
+  }
+
+  // Countdown timer (10 min)
+  (function() {
+    let remaining = 10 * 60;
+    const el = document.getElementById('countdownTimer');
+    if (!el) return;
+    const tick = setInterval(function() {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(tick);
+        el.parentElement.textContent = 'OTP has expired. Please request a new one.';
+        el.parentElement.style.color = '#e53e3e';
+        return;
+      }
+      const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+      const s = (remaining % 60).toString().padStart(2, '0');
+      el.textContent = m + ':' + s;
+      if (remaining < 60) el.style.color = '#e53e3e';
+    }, 1000);
+  })();
+</script>
+{% endblock %}

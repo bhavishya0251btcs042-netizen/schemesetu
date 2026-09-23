@@ -1,0 +1,79 @@
+﻿{% extends "base.html" %}
+{% block title %}Login · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-icon">🔑</div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Log in to check your eligibility, apply for schemes, and get scholarship alerts.</p>
+    </div>
+
+    <form method="post" class="form auth-form" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-error" role="alert">
+          {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        {{ form.username }}
+        {% if form.username.errors %}<span class="err">{{ form.username.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field" style="position:relative;">
+        <label for="{{ form.password.id_for_label }}">
+          {{ form.password.label }}
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show/hide password"
+            style="float:right;background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--clr-accent,#1a5c96);font-weight:600;">
+            👁 Show
+          </button>
+        </label>
+        {{ form.password }}
+        {% if form.password.errors %}<span class="err">{{ form.password.errors|striptags }}</span>{% endif %}
+      </div>
+
+      <div class="field checkbox-field" style="margin-top:-.25rem;">
+        {{ form.remember_me }}
+        <label for="{{ form.remember_me.id_for_label }}" style="display:inline;font-weight:400;">
+          {{ form.remember_me.label }}
+        </label>
+      </div>
+
+      <div class="auth-actions" style="margin-top:1.25rem;">
+        <button type="submit" class="btn btn-lg" style="width:100%;">Log in &rarr;</button>
+      </div>
+
+      <p class="auth-switch" style="margin-top:1rem;">
+        New here? <a href="{% url 'accounts:signup' %}">Create a free account</a>
+      </p>
+    </form>
+
+    <!-- JWT info chip -->
+    <div class="jwt-badge">
+      <span>🔒 Secured with JWT · httpOnly cookies · Session-free</span>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const toggle = document.getElementById('pwToggle');
+  const pwInput = document.getElementById('id_password');
+  if (toggle && pwInput) {
+    toggle.addEventListener('click', function() {
+      const showing = pwInput.type === 'text';
+      pwInput.type = showing ? 'password' : 'text';
+      toggle.textContent = showing ? '👁 Show' : '🙈 Hide';
+    });
+  }
+</script>
+{% endblock %}

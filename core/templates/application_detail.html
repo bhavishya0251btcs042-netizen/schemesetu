@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Application {{ application.tracking_id }} Submitted · {{ PRODUCT_NAME }}{% endblock %}
+
+{% block content %}
+<div class="card success-card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+    <span class="pill pill-ok">Application {{ application.get_status_display }}</span>
+    <span class="muted" style="font-size:0.875rem;">Submitted: {{ application.created_at|date:"d M Y, H:i" }}</span>
+  </div>
+
+  <h1 class="page-title" style="margin-bottom:0.25rem;">Application Confirmed: {{ application.tracking_id }}</h1>
+  <p class="lede">Your scholarship application has been successfully received by SchemeSetu. Retain this DAC tracking ID to check verification and disbursement status anytime.</p>
+
+  <div class="actions" style="margin-bottom:1.5rem;">
+    <a class="btn btn-success" href="{% url 'core:track' %}?tracking_id={{ application.tracking_id }}">Track this application &rarr;</a>
+    <a class="btn btn-ghost" href="{% url 'core:check' %}">Check more scholarships</a>
+  </div>
+
+  <h2 class="section-h" style="margin-top:1.5rem;">Application Summary</h2>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="font-size:1.05rem; color:var(--navy); margin-bottom:0.35rem;">Personal &amp; Demographic Details</h3>
+      <table class="kv">
+        <tr><th>Scholarship</th><td><strong>{{ application.scheme.name }}</strong></td></tr>
+        <tr><th>Applicant Name</th><td>{{ application.applicant_name }}</td></tr>
+        <tr><th>Date of Birth</th><td>{{ application.date_of_birth|default:"—" }} (Age: {{ application.age }})</td></tr>
+        <tr><th>Gender</th><td>{{ application.get_gender_display }}</td></tr>
+        <tr><th>Category</th><td>{{ application.get_category_display }}</td></tr>
+        <tr><th>Family Income</th><td>Rs {{ application.annual_income|default:0|floatformat:0 }} / year</td></tr>
+        <tr><th>Location</th><td>{{ application.district }}{% if application.district and application.state %}, {% endif %}{{ application.state }}</td></tr>
+        <tr><th>Contact</th><td>{{ application.phone|default:"—" }} &bull; {{ application.email|default:"—" }}</td></tr>
+        <tr><th>Aadhaar Linked</th><td>{% if application.aadhaar_linked %}✓ Yes (DBT Active){% else %}No{% endif %}</td></tr>
+        <tr><th>PwD / Disability</th><td>{{ application.get_disability_status_display }}</td></tr>
+      </table>
+    </div>
+
+    <div>
+      <h3 style="font-size:1.05rem; color:var(--navy); margin-bottom:0.35rem;">Current Academic Profile</h3>
+      <table class="kv">
+        <tr><th>Education Level</th><td>{{ application.get_education_level_display }}</td></tr>
+        <tr><th>Current Course</th><td>{{ application.current_course|default:"—" }}</td></tr>
+        <tr><th>Institution</th><td><strong>{{ application.current_institution|default:"—" }}</strong></td></tr>
+        <tr><th>Year / Sem</th><td>{{ application.current_year|default:"—" }}</td></tr>
+        <tr><th>Latest Score</th><td>{{ application.latest_percentage|default:"—" }}</td></tr>
+        <tr><th>10th Board &amp; %</th><td>{{ application.board_10th|default:"—" }} ({{ application.percentage_10th|default:"—" }})</td></tr>
+        <tr><th>12th Board &amp; %</th><td>{{ application.board_12th|default:"—" }} ({{ application.percentage_12th|default:"—" }})</td></tr>
+        <tr><th>Employment</th><td>{{ application.get_employment_status_display }}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  {% if application.institutions_attended.all %}
+    <h3 style="font-size:1.05rem; color:var(--navy); margin:1.75rem 0 0.5rem;">Schools &amp; Colleges Attended</h3>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Institution Name</th>
+            <th>Type</th>
+            <th>Board / Affiliation</th>
+            <th>Location</th>
+            <th>Years Attended</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inst in application.institutions_attended.all %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><strong>{{ inst.name }}</strong></td>
+              <td>{{ inst.get_institution_type_display }}</td>
+              <td>{{ inst.board_affiliation|default:"—" }}</td>
+              <td>{{ inst.city }}{% if inst.city and inst.state %}, {% endif %}{{ inst.state }}</td>
+              <td>{{ inst.years_attended|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  {% if application.achievements.all %}
+    <h3 style="font-size:1.05rem; color:var(--navy); margin:1.75rem 0 0.5rem;">Academic Achievements &amp; Honours</h3>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Achievement Title</th>
+            <th>Level</th>
+            <th>Year</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ach in application.achievements.all %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td><strong>{{ ach.title }}</strong></td>
+              <td><span class="pill">{{ ach.get_level_display }}</span></td>
+              <td>{{ ach.year|default:"—" }}</td>
+              <td>{{ ach.description|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  {% if application.scholarships_availed %}
+    <div style="margin-top:1.25rem; padding:0.85rem; background:var(--bg); border-radius:var(--radius);">
+      <strong style="color:var(--navy);">Prior Scholarships Availed:</strong>
+      <p style="margin:4px 0 0; font-size:0.925rem;">{{ application.scholarships_availed }}</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

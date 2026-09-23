@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Find the Government Scholarships &amp; Schemes You Actually Qualify For</h1>
+  <p class="lede">
+    {{ PRODUCT_NAME }} evaluates your complete academic profile and matches your school or college against official approved-institution lists. Apply directly in-app and track status with your DAC ID.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-lg" href="{% url 'core:check' %}">Check My Eligibility &rarr;</a>
+    <a class="btn btn-lg btn-ghost" href="{% url 'core:track' %}">Track Application</a>
+  </div>
+</section>
+
+<section class="steps">
+  <div class="step">
+    <span class="num">1</span>
+    <h3>Complete Profile</h3>
+    <p>Enter personal, academic, achievements, and schools/colleges attended in one streamlined form.</p>
+  </div>
+  <div class="step">
+    <span class="num">2</span>
+    <h3>Automatic Institution Matching</h3>
+    <p>Instant verification against approved university and college registries with clear pass/fail reasons.</p>
+  </div>
+  <div class="step">
+    <span class="num">3</span>
+    <h3>Apply Directly In-App</h3>
+    <p>No redirects to external portals &mdash; apply directly with your pre-filled student profile.</p>
+  </div>
+  <div class="step">
+    <span class="num">4</span>
+    <h3>Verified DAC Tracking</h3>
+    <p>Each application gets a unique DAC ID to follow real-time verification and disbursement status.</p>
+  </div>
+</section>
+{% endblock %}
