@@ -66,12 +66,19 @@ def _extract_repeatable_profile_data(post_data):
 
 
 def home(request):
+    try:
+        scheme_count = Scheme.objects.count()
+        restricted_count = Scheme.objects.filter(restrict_to_listed_institutions=True).count()
+    except Exception:
+        # DB not yet available (e.g. first Vercel deploy before migrate runs)
+        scheme_count = 0
+        restricted_count = 0
     return render(
         request,
         "home.html",
         {
-            "scheme_count": Scheme.objects.count(),
-            "restricted_count": Scheme.objects.filter(restrict_to_listed_institutions=True).count(),
+            "scheme_count": scheme_count,
+            "restricted_count": restricted_count,
         },
     )
 
