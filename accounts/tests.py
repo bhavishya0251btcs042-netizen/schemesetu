@@ -1,4 +1,4 @@
-﻿"""
+"""
 accounts/tests.py - Comprehensive tests for:
 - JWT authentication
 - OTP signup with EmailJS & Welcome email
@@ -8,7 +8,7 @@ accounts/tests.py - Comprehensive tests for:
 """
 from datetime import timedelta
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -246,10 +246,17 @@ class ServiceIntegrationTests(TestCase):
         ok2, msg2 = send_welcome_email("test@example.com", "Tester")
         self.assertTrue(ok2)
 
+    @override_settings(MONGODB_URI="")
     def test_mongo_client_handles_unconfigured_gracefully(self):
-        client = get_mongo_client()
-        # When MONGODB_URI is empty, client is None without throwing exceptions
-        self.assertIsNone(client)
-        # Syncing also returns False safely without crash
-        synced = sync_user_to_mongodb(User(username="test_sync"))
-        self.assertFalse(synced)
+        import schemesetu.mongodb as _mod
+        _prev = _mod._mongo_client
+        _mod._mongo_client = None  # reset cached client
+        try:
+            client = get_mongo_client()
+            # When MONGODB_URI is empty, client is None without throwing exceptions
+            self.assertIsNone(client)
+            # Syncing also returns False safely without crash
+            synced = sync_user_to_mongodb(User(username="test_sync"))
+            self.assertFalse(synced)
+        finally:
+            _mod._mongo_client = _prev

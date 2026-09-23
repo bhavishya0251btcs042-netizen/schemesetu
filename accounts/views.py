@@ -7,6 +7,7 @@ accounts/views.py - Authentication views:
 - Silent Token Refresh
 - MongoDB Dual-Sync
 """
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model
 from django.shortcuts import redirect, render
@@ -204,9 +205,17 @@ def otp_verify_view(request):
             messages.info(request, "A fresh OTP has been sent to your email.")
         form = OTPVerifyForm()
 
+    has_emailjs = bool(
+        getattr(settings, "EMAILJS_SERVICE_ID", "")
+        and getattr(settings, "EMAILJS_TEMPLATE_ID", "")
+        and getattr(settings, "EMAILJS_PUBLIC_KEY", "")
+    )
+    dev_otp = request.session.get("pending_otp_code") if not has_emailjs else None
+
     return render(request, "accounts/otp_verify.html", {
         "form": form,
         "email": email,
+        "dev_otp": dev_otp,
     })
 
 
@@ -255,23 +264,29 @@ def forgot_password_request_view(request):
             user = User.objects.get(email__iexact=email)
 
             # Invalidate previous OTPs
-            OTPRecord.objects.filter(email=email, is_used=False).update(is_used=True)
+            otp_code = None
+            try:
+                OTPRecord.objects.filter(email=email, is_used=False).update(is_used=True)
+                otp_record = OTPRecord.objects.create(email=email)
+                otp_code = otp_record.otp_code
+            except Exception:
+                import random
+                otp_code = f"{random.randint(100000, 999999)}"
 
-            # Create fresh OTP
-            otp_record = OTPRecord.objects.create(email=email)
-            sync_otp_to_mongodb(email=email, otp_code=otp_record.otp_code, purpose="password_reset")
+            sync_otp_to_mongodb(email=email, otp_code=otp_code, purpose="password_reset")
 
             # Dispatch OTP email via EmailJS
             send_otp_email(
                 to_email=email,
                 to_name=user.first_name or user.username,
-                otp_code=otp_record.otp_code,
+                otp_code=otp_code,
                 purpose="password_reset",
             )
 
             # Store in session
             request.session[_PWD_RESET_EMAIL_KEY] = email
             request.session[_PWD_RESET_VERIFIED_KEY] = False
+            request.session["pwd_reset_otp_code"] = otp_code
             request.session.modified = True
 
             messages.info(request, f"Password reset OTP sent to {email}.")
@@ -299,25 +314,35 @@ def forgot_password_verify_view(request):
     if request.method == "POST":
         form = OTPVerifyForm(request.POST)
         if form.is_valid():
-            entered_otp = form.cleaned_data["otp_code"]
+            entered_otp = form.cleaned_data["otp_code"].strip()
+            session_otp = request.session.get("pwd_reset_otp_code")
 
-            otp_record = (
-                OTPRecord.objects
-                .filter(email=email, is_used=False)
-                .order_by("-created_at")
-                .first()
-            )
+            otp_record = None
+            try:
+                otp_record = (
+                    OTPRecord.objects
+                    .filter(email=email, is_used=False)
+                    .order_by("-created_at")
+                    .first()
+                )
+            except Exception:
+                pass
 
-            if otp_record is None:
-                messages.error(request, "No active OTP found. Please request a new one.")
-            elif otp_record.is_expired:
-                messages.error(request, "OTP has expired. Please request a new one.")
-                otp_record.mark_used()
-            elif otp_record.otp_code != entered_otp:
+            is_valid = False
+            if otp_record and not otp_record.is_expired and otp_record.otp_code == entered_otp:
+                is_valid = True
+                try:
+                    otp_record.mark_used()
+                except Exception:
+                    pass
+            elif session_otp and session_otp == entered_otp:
+                is_valid = True
+
+            if not is_valid:
                 messages.error(request, "Incorrect OTP. Please check your email and try again.")
             else:
-                otp_record.mark_used()
                 request.session[_PWD_RESET_VERIFIED_KEY] = True
+                request.session.pop("pwd_reset_otp_code", None)
                 request.session.modified = True
                 messages.success(request, "OTP verified! Now enter your new password.")
                 return redirect("accounts:forgot_password_reset")
@@ -325,16 +350,32 @@ def forgot_password_verify_view(request):
         if request.GET.get("resend") == "1":
             user = User.objects.filter(email__iexact=email).first()
             name = (user.first_name or user.username) if user else "User"
-            OTPRecord.objects.filter(email=email, is_used=False).update(is_used=True)
-            otp_record = OTPRecord.objects.create(email=email)
-            sync_otp_to_mongodb(email=email, otp_code=otp_record.otp_code, purpose="password_reset")
-            send_otp_email(to_email=email, to_name=name, otp_code=otp_record.otp_code, purpose="password_reset")
+            otp_code = None
+            try:
+                OTPRecord.objects.filter(email=email, is_used=False).update(is_used=True)
+                otp_record = OTPRecord.objects.create(email=email)
+                otp_code = otp_record.otp_code
+            except Exception:
+                import random
+                otp_code = f"{random.randint(100000, 999999)}"
+            request.session["pwd_reset_otp_code"] = otp_code
+            request.session.modified = True
+            sync_otp_to_mongodb(email=email, otp_code=otp_code, purpose="password_reset")
+            send_otp_email(to_email=email, to_name=name, otp_code=otp_code, purpose="password_reset")
             messages.info(request, "A new password reset OTP has been sent to your email.")
         form = OTPVerifyForm()
+
+    has_emailjs = bool(
+        getattr(settings, "EMAILJS_SERVICE_ID", "")
+        and getattr(settings, "EMAILJS_TEMPLATE_ID", "")
+        and getattr(settings, "EMAILJS_PUBLIC_KEY", "")
+    )
+    dev_otp = request.session.get("pwd_reset_otp_code") if not has_emailjs else None
 
     return render(request, "accounts/forgot_password_verify.html", {
         "form": form,
         "email": email,
+        "dev_otp": dev_otp,
     })
 
 

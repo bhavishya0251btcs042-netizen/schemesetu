@@ -48,7 +48,12 @@ def send_emailjs_email(to_email, to_name, subject, message_body, template_params
             payload["accessToken"] = private_key
 
         try:
-            resp = requests.post(EMAILJS_API_URL, json=payload, timeout=10)
+            headers = {
+                "Content-Type": "application/json",
+                "Origin": getattr(settings, "SITE_URL", "http://localhost"),
+                "User-Agent": "Mozilla/5.0 (compatible; SchemeSetu/1.0)",
+            }
+            resp = requests.post(EMAILJS_API_URL, json=payload, headers=headers, timeout=10)
             if resp.status_code == 200:
                 logger.info(f"EmailJS email sent to {to_email}: {subject}")
                 return True, "Email sent via EmailJS"

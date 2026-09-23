@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Verify Email OTP · {{ PRODUCT_NAME }}{% endblock %}
 
 {% block content %}
@@ -17,6 +17,17 @@
         📨 <strong>Check your email inbox (and spam folder)</strong> for the verification code sent via EmailJS Gateway.
       </p>
     </div>
+
+    {% if dev_otp %}
+    <div class="card" style="background:#fffbe6;border:1px solid #ffe58f;border-radius:.6rem;padding:0.85rem;margin-bottom:1.5rem;text-align:center;">
+      <p style="margin:0 0 0.35rem;font-size:.85rem;color:#874d00;font-weight:600;">
+        ⚠️ EmailJS Environment Variables are not configured yet in your Vercel Dashboard.
+      </p>
+      <p style="margin:0;font-size:.875rem;color:#12243d;">
+        Your verification OTP is: <strong style="font-size:1.35rem;letter-spacing:3px;color:#0e6b52;display:block;margin-top:4px;">{{ dev_otp }}</strong>
+      </p>
+    </div>
+    {% endif %}
 
     <!-- OTP Entry Form -->
     <form method="post" action="{% url 'accounts:otp_verify' %}" class="form auth-form" id="otpForm" novalidate>
