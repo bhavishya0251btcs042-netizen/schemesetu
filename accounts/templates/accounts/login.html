@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Login · {{ PRODUCT_NAME }}{% endblock %}
 
 {% block content %}
@@ -39,11 +39,14 @@
         {% if form.password.errors %}<span class="err">{{ form.password.errors|striptags }}</span>{% endif %}
       </div>
 
-      <div class="field checkbox-field" style="margin-top:-.25rem;">
-        {{ form.remember_me }}
-        <label for="{{ form.remember_me.id_for_label }}" style="display:inline;font-weight:400;">
-          {{ form.remember_me.label }}
-        </label>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:-.25rem;flex-wrap:wrap;gap:.5rem;">
+        <div class="field checkbox-field" style="margin:0;">
+          {{ form.remember_me }}
+          <label for="{{ form.remember_me.id_for_label }}" style="display:inline;font-weight:400;">
+            {{ form.remember_me.label }}
+          </label>
+        </div>
+        <a href="{% url 'accounts:forgot_password' %}" style="font-size:.85rem;color:var(--clr-accent,#1a5c96);font-weight:600;">Forgot password?</a>
       </div>
 
       <div class="auth-actions" style="margin-top:1.25rem;">

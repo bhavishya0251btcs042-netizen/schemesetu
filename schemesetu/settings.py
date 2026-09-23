@@ -1,10 +1,15 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / ".env")
+
 # Dev key — for a campus pilot only. Regenerate before any public deployment.
-SECRET_KEY = "dac-schemesetu-dev-key-change-me-in-production"
-DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY", "dac-schemesetu-dev-key-change-me-in-production")
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -89,4 +94,24 @@ JWT_REFRESH_EXPIRY_DAYS = 7      # refresh token valid for 7 days (30 if remembe
 
 # Where @login_required redirects unauthenticated users
 LOGIN_URL = "/auth/login/"
+
+# ---------------------------------------------------------------------------
+# MongoDB Database Configuration (.env driven)
+# ---------------------------------------------------------------------------
+MONGODB_URI = os.getenv("MONGODB_URI", "").strip()
+MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "schemesetu").strip()
+
+# ---------------------------------------------------------------------------
+# EmailJS Gateway Configuration (.env driven)
+# ---------------------------------------------------------------------------
+EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID", "").strip()
+EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID", "").strip()
+EMAILJS_WELCOME_TEMPLATE_ID = os.getenv("EMAILJS_WELCOME_TEMPLATE_ID", "").strip()
+EMAILJS_PUBLIC_KEY = os.getenv("EMAILJS_PUBLIC_KEY", "").strip()
+EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY", "").strip()
+
+# ---------------------------------------------------------------------------
+# Base Website URL (Used for links in emails and deployment)
+# ---------------------------------------------------------------------------
+SITE_URL = os.getenv("SITE_URL", "http://127.0.0.1:8000").rstrip("/")
 

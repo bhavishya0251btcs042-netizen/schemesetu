@@ -111,3 +111,46 @@ class LoginForm(forms.Form):
         required=False,
         label="Keep me logged in for 30 days",
     )
+
+
+class ForgotPasswordRequestForm(forms.Form):
+    """Step 1 of forgot password: enter registered email."""
+
+    email = forms.EmailField(
+        label="Registered Email Address",
+        widget=forms.EmailInput(attrs={"placeholder": "e.g. student@dbs.edu.in", "autocomplete": "email"}),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if not User.objects.filter(email__iexact=email).exists():
+            raise ValidationError("No registered account found with this email address.")
+        return email
+
+
+class ResetPasswordForm(forms.Form):
+    """Step 3 of forgot password: enter and re-enter new password."""
+
+    new_password1 = forms.CharField(
+        label="New Password",
+        widget=forms.PasswordInput(attrs={"placeholder": "Minimum 8 characters", "autocomplete": "new-password"}),
+    )
+    new_password2 = forms.CharField(
+        label="Confirm New Password",
+        widget=forms.PasswordInput(attrs={"placeholder": "Re-enter your new password", "autocomplete": "new-password"}),
+    )
+
+    def clean_new_password1(self):
+        pw = self.cleaned_data.get("new_password1", "")
+        if len(pw) < 8:
+            raise ValidationError("Password must be at least 8 characters long.")
+        return pw
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get("new_password1")
+        p2 = cleaned.get("new_password2")
+        if p1 and p2 and p1 != p2:
+            self.add_error("new_password2", "Passwords do not match.")
+        return cleaned
+
