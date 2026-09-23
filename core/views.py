@@ -22,6 +22,19 @@ from .models import (
     ACHIEVEMENT_LEVEL_CHOICES,
     INSTITUTION_TYPE_CHOICES,
 )
+from django.http import HttpResponse
+from .context_processors import INLINE_CSS
+
+
+def serve_css(request):
+    """Guaranteed fallback to serve style.css directly with text/css MIME type."""
+    return HttpResponse(INLINE_CSS, content_type="text/css; charset=utf-8")
+
+
+def favicon(request):
+    """Clean 204 handler to prevent browser console 404 errors for favicon."""
+    return HttpResponse(status=204)
+
 
 PROFILE_KEY = "citizen_profile"
 
